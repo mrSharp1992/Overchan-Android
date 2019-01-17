@@ -32,7 +32,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -324,12 +323,8 @@ public class MakabaModule extends CloudflareChanModule {
         String passcodeDomain = "";
         for (Cookie cookie : httpClient.getCookieStore().getCookies()) {
             if (cookie.getName().equals(USERCODE_NOCAPTCHA_COOKIE_NAME) && cookie.getDomain().contains(domain)) {
-                if (!passcode.equals("")) {
-                    passcodeCookie = cookie.getValue();
-                    passcodeDomain = cookie.getDomain();
-                }
-                ((BasicClientCookie)cookie).setExpiryDate(new Date(0));
-                httpClient.getCookieStore().clearExpired(new Date());
+                passcodeCookie = cookie.getValue();
+                passcodeDomain = cookie.getDomain();
                 break;
             }
         }

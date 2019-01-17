@@ -121,14 +121,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </string-array>
     <string name="pref_key_font_size">PREF_KEY_FONT_SIZE</string>
     <string name="pref_font_size_value_default">@string/pref_font_size_value_small</string>
+    <string name="pref_font_size_value_micro">PREF_FONT_SIZE_VALUE_MICRO</string>
+    <string name="pref_font_size_value_very_small">PREF_FONT_SIZE_VALUE_VERY_SMALL</string>
     <string name="pref_font_size_value_small">PREF_FONT_SIZE_VALUE_SMALL</string>
-    <string name="pref_font_size_value_medium">PREF_FONT_SIZE_VALUE_MEDIUM1</string>
+    <string name="pref_font_size_value_medium">PREF_FONT_SIZE_VALUE_MEDIUM</string>
     <string name="pref_font_size_value_large">PREF_FONT_SIZE_VALUE_LARGE</string>
+    <string name="pref_font_size_value_very_large">PREF_FONT_SIZE_VALUE_VERY_LARGE</string>
     <string name="pref_font_size_value_huge">PREF_FONT_SIZE_VALUE_HUGE</string>
     <string-array name="pref_font_size_values" translatable="false">
+        <item>@string/pref_font_size_value_micro</item>
+        <item>@string/pref_font_size_value_very_small</item>
         <item>@string/pref_font_size_value_small</item>
         <item>@string/pref_font_size_value_medium</item>
         <item>@string/pref_font_size_value_large</item>
+        <item>@string/pref_font_size_value_very_large</item>
         <item>@string/pref_font_size_value_huge</item>
     </string-array>
     <string name="pref_key_sidepanel_hide">PREF_KEY_SIDEPANEL_HIDE</string>

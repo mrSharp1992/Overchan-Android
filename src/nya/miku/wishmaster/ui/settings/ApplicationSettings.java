@@ -41,11 +41,17 @@ public class ApplicationSettings {
     private final boolean isTablet;
     private final boolean isSFW;
     
+    private void initHiddenPreferences() {
+        if (!preferences.contains(resources.getString(R.string.pref_key_quickaccess_json)))
+            preferences.edit().putString(resources.getString(R.string.pref_key_quickaccess_json), "[{}]").commit();
+    }
+
     public ApplicationSettings(SharedPreferences preferences, Resources resources) {
         this.preferences = preferences;
         this.resources = resources;
         this.isTablet = (resources.getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE;
         this.isSFW = !R.class.getPackage().getName().endsWith(".wishmaster");
+        initHiddenPreferences();
     }
     
     public File getDefaultDownloadDir() {
@@ -186,9 +192,12 @@ public class ApplicationSettings {
     private int getFontSizeStyle() {
         String defaultFontSizeValue = resources.getString(R.string.pref_font_size_value_default);
         String fontSize = preferences.getString(resources.getString(R.string.pref_key_font_size), defaultFontSizeValue);
+        if (fontSize.equals(resources.getString(R.string.pref_font_size_value_micro))) return R.style.FontSize_Micro;
+        if (fontSize.equals(resources.getString(R.string.pref_font_size_value_very_small))) return R.style.FontSize_VerySmall;
         if (fontSize.equals(resources.getString(R.string.pref_font_size_value_small))) return R.style.FontSize_Small;
         if (fontSize.equals(resources.getString(R.string.pref_font_size_value_medium))) return R.style.FontSize_Medium;
         if (fontSize.equals(resources.getString(R.string.pref_font_size_value_large))) return R.style.FontSize_Large;
+        if (fontSize.equals(resources.getString(R.string.pref_font_size_value_very_large))) return R.style.FontSize_VeryLarge;
         if (fontSize.equals(resources.getString(R.string.pref_font_size_value_huge))) return R.style.FontSize_Huge;
         return R.style.FontSize_Small;
     }

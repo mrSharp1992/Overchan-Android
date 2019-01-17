@@ -68,7 +68,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:defaultValue="@string/pref_font_size_value_default" />
         
         <EditTextPreference
-            android:defaultValue="null"
+            android:defaultValue=""
             android:key="@string/pref_key_cut_posts"
             android:title="@string/pref_cut_posts_title"
             android:hint="@string/pref_cut_posts_hint"

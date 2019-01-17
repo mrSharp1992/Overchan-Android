@@ -592,9 +592,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </string-array>
     <string name="pref_font_size_title">Textgröße</string>
     <string-array name="pref_font_size_choices">
+        <item>Mikro</item>
+        <item>Sehr klein</item>
         <item>Klein</item>
         <item>Mittelgroß</item>
         <item>Groß</item>
+        <item>Sehr groß</item>
         <item>Riesig</item>
     </string-array>
     <string name="pref_sidepanel_hide_title">Tabs Panel nicht zeigen</string>

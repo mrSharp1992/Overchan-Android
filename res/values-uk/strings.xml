@@ -604,10 +604,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </string-array>
     <string name="pref_font_size_title">Розмір літер</string>
     <string-array name="pref_font_size_choices">
+        <item>Мікро</item>
+        <item>Дуже маленький</item>
         <item>Маленький</item>
         <item>Середній</item>
         <item>Великий</item>
         <item>Дуже великий</item>
+        <item>Величезний</item>
     </string-array>
     <string name="pref_sidepanel_hide_title">Ховати панель вкладок</string>
     <string name="pref_sidepanel_hide_summary">Не тримати панель вкладок весь час на екрані</string>

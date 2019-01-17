@@ -32,6 +32,8 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.tuple.Triple;
 
@@ -2942,7 +2944,13 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         if (withQuote) {
             String quotedComment = (quote != null ? quote : item.spannedComment.toString().replaceAll("(^|\n)(>>\\d+(\n|\\s)?)+", "$1")).
                     replaceAll("(\n+)", "$1>");
-            insertion = ">>" + item.sourceModel.number + "\n" + (quotedComment.length() > 0 ? ">" + quotedComment + "\n" : "");
+            String lastQuotedPost = null;
+            Matcher matcher = Pattern.compile("(^|\n)>>(\\d+)").matcher(sendReplyModel.comment.substring(0, sendReplyModelPos));
+            while(matcher.find())
+                lastQuotedPost = matcher.group(2);
+            insertion = (sendReplyModelPos > 0 && sendReplyModel.comment.charAt(sendReplyModelPos - 1) != '\n' ? "\n" : "") +
+                (item.sourceModel.number.equals(lastQuotedPost) ? "" : ">>" + item.sourceModel.number + "\n") +
+                (quotedComment.length() > 0 ? ">" + quotedComment + "\n" : "");
         } else {
             insertion = ">>" + item.sourceModel.number + "\n";
         }
