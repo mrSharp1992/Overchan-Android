@@ -47,6 +47,7 @@ import nya.miku.wishmaster.ui.tabs.TabsSwitcher;
 
 import org.acra.ACRA;
 import org.acra.annotation.ReportsCrashes;
+import com.squareup.leakcanary.LeakCanary;
 
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
@@ -272,6 +273,11 @@ public class MainApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        if (LeakCanary.isInAnalyzerProcess(this)) {
+            return;
+        } else {
+            LeakCanary.install(this);
+        }
         ACRA.init(this);
         if (isGalleryProcess()) return;
         initObjects();
