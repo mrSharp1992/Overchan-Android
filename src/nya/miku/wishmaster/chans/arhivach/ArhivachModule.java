@@ -305,23 +305,21 @@ public class ArhivachModule extends CloudflareChanModule {
     @Override
     public String buildUrl(UrlPageModel model) throws IllegalArgumentException {
         if (!model.chanName.equals(CHAN_NAME)) throw new IllegalArgumentException("wrong chan");
+        if (model.boardName != null && !model.boardName.matches("\\w*")) throw new IllegalArgumentException("wrong board name");
         StringBuilder url = new StringBuilder(getUsingUrl());
         switch (model.type) {
             case UrlPageModel.TYPE_INDEXPAGE:
                 url.append("index").append("/");
                 break;
             case UrlPageModel.TYPE_BOARDPAGE:
-                if (!model.boardName.equals("")) throw new IllegalArgumentException("wrong board name");
                 url.append("index").append("/");
                 if (model.boardPage > 1) url.append((model.boardPage - 1) * 25).append("/");
                 break;
             case UrlPageModel.TYPE_THREADPAGE:
-                if (!model.boardName.equals("")) throw new IllegalArgumentException("wrong board name");
                 url.append("thread/").append(model.threadNumber).append("/");
                 if (model.postNumber != null && model.postNumber.length() != 0) url.append("#").append(model.postNumber);
                 break;
             case UrlPageModel.TYPE_SEARCHPAGE:
-                if (!model.boardName.equals("")) throw new IllegalArgumentException("wrong board name");
                 url.append("index").append("/");
                 if (model.boardPage > 1) url.append((model.boardPage - 1) * 25).append("/");
                 url.append("?q=" + model.searchRequest + "&tags=");
@@ -348,7 +346,7 @@ public class ArhivachModule extends CloudflareChanModule {
                 model.type = UrlPageModel.TYPE_THREADPAGE;
                 Matcher matcher = Pattern.compile("thread/(\\d+)/?(.*)").matcher(urlPath);
                 if (!matcher.find()) throw new IllegalArgumentException("wrong thread number");
-                model.boardName = "";
+                model.boardName = ArhivachBoards.DEFAULT_BOARD;
                 model.threadNumber = matcher.group(1);
                 if (matcher.group(2).startsWith("#")) {
                     String post = matcher.group(2).substring(1);
@@ -358,7 +356,7 @@ public class ArhivachModule extends CloudflareChanModule {
             } else if (urlPath.contains("tags=")) {
                 //TODO: implement search request parser
                 model.type = UrlPageModel.TYPE_SEARCHPAGE;
-                model.boardName = "";
+                model.boardName = ArhivachBoards.DEFAULT_BOARD;
                 Matcher matcher = INDEX_PAGE_PATTERN.matcher(urlPath);
                 String page = "";
                 if (matcher.find())
@@ -375,7 +373,7 @@ public class ArhivachModule extends CloudflareChanModule {
                 }
             } else if ((urlPath.length()==0 || urlPath.startsWith("/") || urlPath.contains("index")) && !urlPath.contains("tags=")) {
                 model.type = UrlPageModel.TYPE_BOARDPAGE;
-                model.boardName = "";
+                model.boardName = ArhivachBoards.DEFAULT_BOARD;
                 Matcher matcher = INDEX_PAGE_PATTERN.matcher(urlPath);
                 String page = "";
                 if (matcher.find())

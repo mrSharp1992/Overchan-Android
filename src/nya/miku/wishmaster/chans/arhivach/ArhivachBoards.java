@@ -34,8 +34,9 @@ public class ArhivachBoards {
     private static final List<BoardModel> LIST = new ArrayList<BoardModel>();
     private static final Map<String, BoardModel> MAP = new HashMap<String, BoardModel>();
     private static final SimpleBoardModel[] SIMPLE_ARRAY;
+    final static String DEFAULT_BOARD = "arhivach";
     static {
-        addBoard("", "Arhivach", "Arhivach", true);
+        addBoard(DEFAULT_BOARD, "Arhivach", null, true);
         SIMPLE_ARRAY = new SimpleBoardModel[LIST.size()];
         for (int i=0; i<LIST.size(); ++i) SIMPLE_ARRAY[i] = new SimpleBoardModel(LIST.get(i));
     }
