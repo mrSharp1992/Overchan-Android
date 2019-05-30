@@ -49,6 +49,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -637,7 +638,16 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
             public void run() {
                 try {
                     currentTask = new CancellableTask.BaseCancellableTask();
-                    final CaptchaModel bmp = chan.getNewCaptcha(sendPostModel.boardName, sendPostModel.threadNumber, null, currentTask);
+                    CaptchaModel model = chan.getNewCaptcha(sendPostModel.boardName, sendPostModel.threadNumber, null, currentTask);
+                    if (model != null && model.bitmap != null && model.bitmap.hasAlpha()) {
+                        Bitmap bitmap = Bitmap.createBitmap(model.bitmap.getWidth(), model.bitmap.getHeight(), model.bitmap.getConfig());
+                        bitmap.eraseColor(Color.WHITE);
+                        Canvas canvas = new Canvas(bitmap);
+                        canvas.drawBitmap(model.bitmap, 0f, 0f, null);
+                        model.bitmap.recycle();
+                        model.bitmap = bitmap;
+                    }
+                    final CaptchaModel bmp = model;
                     if (currentTask != null && currentTask.isCancelled()) return;
                     Async.runOnUiThread(new Runnable() {
                         @Override
