@@ -141,6 +141,21 @@ public class TabsAdapter extends ArrayAdapter<TabModel> {
     }
     
     /**
+     * @return Возвращает, если возможно, позицию последней выбранной обычной вкладки (position >= 0)
+     */
+    public int getSelectedTab() {
+        final long id;
+        if (selectedItem < 0 && (id = tabsIdStack.getCurrentTab()) != -1) {
+            for (int i = 0; i < getCount(); ++i) {
+                if (getItem(i).id == id) {
+                    return i;
+                }
+            }
+        }
+        return selectedItem;
+    }
+
+    /**
      * Закрыть вкладку
      * @param position позиция вкладки в списке
      */

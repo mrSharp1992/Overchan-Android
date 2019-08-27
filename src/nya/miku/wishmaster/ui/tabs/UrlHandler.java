@@ -106,7 +106,7 @@ public class UrlHandler {
             }
         }
         
-        int selected = tabsAdapter.getSelectedItem();
+        int selected = tabsAdapter.getSelectedTab();
         if (selected >= 0 && selected < tabsAdapter.getCount()) {
             tabsAdapter.insert(model, selected + 1, !switchAfter);
         } else {
