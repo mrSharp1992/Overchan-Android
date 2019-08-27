@@ -96,8 +96,10 @@ public class UrlHandler {
         TabsAdapter tabsAdapter = activity.tabsAdapter;
         for (int i=0; i<tabsAdapter.getCount(); ++i) {
             if (tabsAdapter.getItem(i).hash != null && tabsAdapter.getItem(i).hash.equals(model.hash)) {
-                tabsAdapter.getItem(i).startItemNumber = model.startItemNumber;
-                tabsAdapter.getItem(i).startItemTop = TabModel.DEFAULT_TOP;
+                if (model.startItemNumber != null) {
+                    tabsAdapter.getItem(i).startItemNumber = model.startItemNumber;
+                    tabsAdapter.getItem(i).startItemTop = TabModel.DEFAULT_TOP;
+                }
                 tabsAdapter.getItem(i).forceUpdate = true;
                 if (switchAfter) tabsAdapter.setSelectedItem(i);
                 return;
