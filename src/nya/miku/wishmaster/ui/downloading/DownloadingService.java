@@ -343,8 +343,14 @@ public class DownloadingService extends Service {
                     }
                     File target = new File(directory, filename);
                     if (target.exists()) {
-                        addError(item, elementName, getString(R.string.downloading_error_file_exists));
-                        continue;
+                        int extensionPos = filename.lastIndexOf(".");
+                        String name = (extensionPos >= 0) ? filename.substring(0, extensionPos) : filename;
+                        String extension = (extensionPos >= 0) ? filename.substring(extensionPos) : "";
+                        int n = 0;
+                        do {
+                            ++n;
+                            target = new File(directory, name + "(" + n + ")" + extension);
+                        } while (target.exists());
                     }
                     File fromCache = fileCache.get(FileCache.PREFIX_ORIGINALS + ChanModels.hashAttachmentModel(item.attachment) +
                             Attachments.getAttachmentExtention(item.attachment));

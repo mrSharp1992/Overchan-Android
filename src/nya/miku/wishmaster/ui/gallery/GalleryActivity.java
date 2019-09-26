@@ -37,6 +37,7 @@ import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.common.Logger;
+import nya.miku.wishmaster.lib.ClickableToast;
 import nya.miku.wishmaster.lib.gallery.FixedSubsamplingScaleImageView;
 import nya.miku.wishmaster.lib.gallery.JSWebView;
 import nya.miku.wishmaster.lib.gallery.Jpeg;
@@ -449,11 +450,16 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         if (DownloadingService.isInQueue(queueItem)) {
             Toast.makeText(this, getString(R.string.notification_download_already_in_queue, itemName), Toast.LENGTH_LONG).show();
         } else {
+            final Intent downloadIntent = new Intent(this, DownloadingService.class);
+            downloadIntent.putExtra(DownloadingService.EXTRA_DOWNLOADING_ITEM, queueItem);
             if (new File(new File(settings.getDownloadDirectory(), chan), fileName).exists()) {
-                Toast.makeText(this, getString(R.string.notification_download_already_exists, fileName), Toast.LENGTH_LONG).show();
+                ClickableToast.showText(this, getString(R.string.notification_download_already_exists, fileName), new ClickableToast.OnClickListener() {
+                    @Override
+                    public void onClick() {
+                        startService(downloadIntent);
+                    }
+                });
             } else {
-                Intent downloadIntent = new Intent(this, DownloadingService.class);
-                downloadIntent.putExtra(DownloadingService.EXTRA_DOWNLOADING_ITEM, queueItem);
                 startService(downloadIntent);
             }
         }
