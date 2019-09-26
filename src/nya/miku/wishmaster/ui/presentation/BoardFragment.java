@@ -1851,8 +1851,13 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             if ((lastSelectedQuote != null) && (lastFocusedItemIndex >= 0)) {
                 SendPostModel sendReplyModel = fragment().getSendPostModel();
                 sendReplyModel.password = null;
-                PresentationItemModel item = fragment().adapter.getItem(lastFocusedItemIndex);
-                if (item == null) return sendIntent;
+                PresentationItemModel item;
+                try {
+                    item = getItem(lastFocusedItemIndex);
+                } catch (Exception e) {
+                    Logger.e(TAG, e);
+                    return sendIntent;
+                }
                 String postNumber = item.sourceModel.number;
                 MainApplication instance = MainApplication.getInstance();
                 ChanModule chan = instance.getChanModule(sendReplyModel.chanName);
