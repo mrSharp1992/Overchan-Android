@@ -30,6 +30,7 @@ import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.models.CaptchaModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
+import nya.miku.wishmaster.cache.FileCache;
 import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.common.MainApplication;
@@ -294,10 +295,10 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
+            File file = null;
             switch (requestCode) {
                 case REQUEST_CODE_ATTACH_FILE:
                     String path = data.getStringExtra(FileDialogActivity.RESULT_PATH);
-                    File file = null;
                     if (path != null) {
                         file = new File(path);
                         currentPath = file.getParent();
@@ -306,7 +307,21 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
                     break;
                 case REQUEST_CODE_ATTACH_GALLERY:
                     Uri imageUri = data.getData();
-                    handleFile(UriFileUtils.getFile(this, imageUri));
+                    file = UriFileUtils.getFile(this, imageUri);
+                    if (file == null && "content".equalsIgnoreCase(imageUri.getScheme())) {
+                        String name = UriFileUtils.getContentName(this, imageUri);
+                        if (name != null && !name.equals("")) {
+                            FileCache fileCache = MainApplication.getInstance().fileCache;
+                            file = fileCache.create(fileCache.PREFIX_ATTACHMENTS + name);
+                            if (UriFileUtils.saveContent(this, imageUri, file)) {
+                                fileCache.put(file);
+                            } else {
+                                fileCache.abort(file);
+                                file = null;
+                            }
+                        }
+                    }
+                    handleFile(file);
                     break;
             }
             saveSendPostModel();
@@ -359,6 +374,11 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
             @Override
             public void onClick(View v) {
                 int position = attachmentsLayout.indexOfChild((View)v.getTag());
+                File attachment = attachments.get(position);
+                FileCache fileCache = MainApplication.getInstance().fileCache;
+                if (fileCache.get(attachment.toString()) != null) {
+                    fileCache.delete(attachment);
+                }
                 attachments.remove(position);
                 attachmentsLayout.removeViewAt(position);
             }
