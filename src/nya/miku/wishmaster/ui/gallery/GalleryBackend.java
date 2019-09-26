@@ -290,7 +290,7 @@ public class GalleryBackend extends Service {
             }
             if (file == null || !file.exists() || file.isDirectory() || file.length() == 0) {
                 File dir = new File(settings.getDownloadDirectory(), chan.getChanName());
-                file = new File(dir, Attachments.getAttachmentLocalFileName(attachmentModel, boardModel));
+                file = new File(dir, Attachments.getAttachmentLocalFileName(attachmentModel, boardModel, settings.isDownloadOriginalNames()));
                 String filename = file.getAbsolutePath();
                 while (downloadingLocker.isLocked(filename)) downloadingLocker.waitUnlock(filename);
                 if (callback.isCancelled()) return null;
@@ -299,7 +299,7 @@ public class GalleryBackend extends Service {
                 if (file == null || !file.exists() || file.isDirectory() || file.length() == 0) {
                     File dir = new File(settings.getDownloadDirectory(), chan.getChanName());
                     dir = new File(dir, customSubdir);
-                    file = new File(dir, Attachments.getAttachmentLocalFileName(attachmentModel, boardModel));
+                    file = new File(dir, Attachments.getAttachmentLocalFileName(attachmentModel, boardModel, settings.isDownloadOriginalNames()));
                     String filename = file.getAbsolutePath();
                     while (downloadingLocker.isLocked(filename)) downloadingLocker.waitUnlock(filename);
                     if (callback.isCancelled()) return null;
@@ -316,7 +316,7 @@ public class GalleryBackend extends Service {
                 try {
                     out = new FileOutputStream(file);
                     String localName = DownloadingService.ORIGINALS_FOLDER + "/" +
-                            Attachments.getAttachmentLocalFileName(attachmentModel, boardModel);
+                            Attachments.getAttachmentLocalFileName(attachmentModel, boardModel, settings.isDownloadOriginalNames());
                     if (localFile != null && localFile.hasFile(localName)) {
                         fromLocal = IOUtils.modifyInputStream(localFile.openStream(localName), null, callback);
                         IOUtils.copyStream(fromLocal, out);

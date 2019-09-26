@@ -113,6 +113,10 @@ public class ApplicationSettings {
         return preferences.getBoolean(resources.getString(R.string.pref_key_download_lazy), true);
     }
     
+    public boolean isDownloadOriginalNames() {
+        return preferences.getBoolean(resources.getString(R.string.pref_key_download_original_names), false);
+    }
+
     public boolean isPopupLinks() {
         return true;
     }

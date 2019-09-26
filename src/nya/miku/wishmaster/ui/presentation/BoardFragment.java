@@ -3362,9 +3362,9 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         DownloadingService.DownloadingQueueItem item = (subdir != null) ?
                 new DownloadingService.DownloadingQueueItem(attachment, subdir, presentationModel.source.boardModel) :
                     new DownloadingService.DownloadingQueueItem(attachment, presentationModel.source.boardModel);
-        String fileName = Attachments.getAttachmentLocalFileName(attachment, presentationModel.source.boardModel);
+        String fileName = Attachments.getAttachmentLocalFileName(attachment, presentationModel.source.boardModel, settings.isDownloadOriginalNames());
         
-        String itemName = Attachments.getAttachmentLocalShortName(attachment, presentationModel.source.boardModel);
+        String itemName = Attachments.getAttachmentLocalShortName(attachment, presentationModel.source.boardModel, settings.isDownloadOriginalNames());
         if (DownloadingService.isInQueue(item)) {
             if (!fromGridGallery)
                 Toast.makeText(activity, resources.getString(R.string.notification_download_already_in_queue, itemName), Toast.LENGTH_LONG).show();

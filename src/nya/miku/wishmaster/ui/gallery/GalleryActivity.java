@@ -444,8 +444,8 @@ public class GalleryActivity extends Activity implements View.OnClickListener {
         GalleryItemViewTag tag = getCurrentTag();
         if (tag == null) return;
         DownloadingService.DownloadingQueueItem queueItem = new DownloadingService.DownloadingQueueItem(tag.attachmentModel, boardModel);
-        String fileName = Attachments.getAttachmentLocalFileName(tag.attachmentModel, boardModel);
-        String itemName = Attachments.getAttachmentLocalShortName(tag.attachmentModel, boardModel);
+        String fileName = Attachments.getAttachmentLocalFileName(tag.attachmentModel, boardModel, settings.isDownloadOriginalNames());
+        String itemName = Attachments.getAttachmentLocalShortName(tag.attachmentModel, boardModel, settings.isDownloadOriginalNames());
         if (DownloadingService.isInQueue(queueItem)) {
             Toast.makeText(this, getString(R.string.notification_download_already_in_queue, itemName), Toast.LENGTH_LONG).show();
         } else {

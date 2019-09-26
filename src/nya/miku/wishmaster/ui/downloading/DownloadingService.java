@@ -294,10 +294,10 @@ public class DownloadingService extends Service {
                         getString(R.string.downloading_title, downloadingQueue.size() + 1) : getString(R.string.downloading_title_simple));
                 
                 if (item.type == DownloadingQueueItem.TYPE_ATTACHMENT) {
-                    final String filename = Attachments.getAttachmentLocalFileName(item.attachment, item.boardModel);
+                    final String filename = Attachments.getAttachmentLocalFileName(item.attachment, item.boardModel, settings.isDownloadOriginalNames());
                     if (filename == null) continue;
                     String elementName = getString(R.string.downloading_element_format, item.chanName,
-                            Attachments.getAttachmentLocalShortName(item.attachment, item.boardModel));
+                            Attachments.getAttachmentLocalShortName(item.attachment, item.boardModel, settings.isDownloadOriginalNames()));
                     currentItemName = elementName;
                     
                     curProgress = -1;
@@ -449,7 +449,7 @@ public class DownloadingService extends Service {
                                         public String getOriginal(AttachmentModel attachment) {
                                             String chanRef = chan.fixRelativeUrl(attachment.path != null ? attachment.path : attachment.thumbnail);
                                             if (attachment.type != AttachmentModel.TYPE_OTHER_NOTFILE) {
-                                                String filename = Attachments.getAttachmentLocalFileName(attachment, page.boardModel);
+                                                String filename = Attachments.getAttachmentLocalFileName(attachment, page.boardModel, settings.isDownloadOriginalNames());
                                                 if (filename != null && filename.length() != 0) {
                                                     //TODO проверять, когда вложение отсутствует и в папке с загрузками, и в кэше, отдавать ссылку
                                                     return ORIGINALS_FOLDER + "/" + filename;
@@ -600,10 +600,10 @@ public class DownloadingService extends Service {
                             if (isCancelled()) throw new Exception();
                             
                             AttachmentModel attachment = attachments.get(i);
-                            String curFile = Attachments.getAttachmentLocalFileName(attachment, item.boardModel);
+                            String curFile = Attachments.getAttachmentLocalFileName(attachment, item.boardModel, settings.isDownloadOriginalNames());
                             if (curFile == null) continue;
                             String curElementName = getString(R.string.downloading_element_format, item.chanName,
-                                    Attachments.getAttachmentLocalShortName(attachment, item.boardModel));
+                                    Attachments.getAttachmentLocalShortName(attachment, item.boardModel, settings.isDownloadOriginalNames()));
                             String curThumbElementName = getString(R.string.downloading_thumbnail_format, curElementName);
                             String curHash = ChanModels.hashAttachmentModel(attachment);
                             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
