@@ -476,7 +476,6 @@ public abstract class AbstractLynxChanModule extends AbstractWakabaModule {
         return url;
     }
 
-    //TODO: parse case-sensitive board names
     @Override
     public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
         String urlPath = UrlPathUtils.getUrlPath(url, getAllDomains());
@@ -494,7 +493,7 @@ public abstract class AbstractLynxChanModule extends AbstractWakabaModule {
             } catch (Exception e) {
             }
         }
-        UrlPageModel model = WakabaUtils.parseUrlPath(urlPath, getChanName());
+        UrlPageModel model = WakabaUtils.parseUrlPath(urlPath, getChanName(), false);
         if ((model.type == UrlPageModel.TYPE_BOARDPAGE) && (model.boardPage < 1)) {
             model.boardPage = 1;
         }
