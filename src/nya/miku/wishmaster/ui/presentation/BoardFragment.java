@@ -3549,23 +3549,28 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         DownloadingService.DownloadingQueueItem item = (subdir != null) ?
                 new DownloadingService.DownloadingQueueItem(attachment, subdir, presentationModel.source.boardModel) :
                     new DownloadingService.DownloadingQueueItem(attachment, presentationModel.source.boardModel);
-        String fileName = Attachments.getAttachmentLocalFileName(attachment, presentationModel.source.boardModel);
+        String fileName = Attachments.getAttachmentLocalFileName(attachment, presentationModel.source.boardModel, settings.isDownloadOriginalNames());
         
-        String itemName = Attachments.getAttachmentLocalShortName(attachment, presentationModel.source.boardModel);
+        String itemName = Attachments.getAttachmentLocalShortName(attachment, presentationModel.source.boardModel, settings.isDownloadOriginalNames());
         if (DownloadingService.isInQueue(item)) {
             if (!fromGridGallery)
                 Toast.makeText(activity, resources.getString(R.string.notification_download_already_in_queue, itemName), Toast.LENGTH_LONG).show();
             return false;
         } else {
+            final Intent downloadIntent = new Intent(activity, DownloadingService.class);
+            downloadIntent.putExtra(DownloadingService.EXTRA_DOWNLOADING_ITEM, item);
             File dir = new File(settings.getDownloadDirectory(), tabModel.pageModel.chanName);
             if (subdir != null) dir = new File(dir, subdir);
             if (new File(dir, fileName).exists()) {
                 if (!fromGridGallery)
-                    Toast.makeText(activity, resources.getString(R.string.notification_download_already_exists, fileName), Toast.LENGTH_LONG).show();
+                    ClickableToast.showText(activity, resources.getString(R.string.notification_download_already_exists, fileName), new ClickableToast.OnClickListener() {
+                        @Override
+                        public void onClick() {
+                            activity.startService(downloadIntent);
+                        }
+                    });
                 return false;
             } else {
-                Intent downloadIntent = new Intent(activity, DownloadingService.class);
-                downloadIntent.putExtra(DownloadingService.EXTRA_DOWNLOADING_ITEM, item);
                 activity.startService(downloadIntent);
                 return true;
             }

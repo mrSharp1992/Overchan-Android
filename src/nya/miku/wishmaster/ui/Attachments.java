@@ -28,6 +28,7 @@ import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BoardModel;
 import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.api.util.RegexUtils;
+import nya.miku.wishmaster.common.MainApplication;
 
 public class Attachments {
     /**
@@ -90,7 +91,11 @@ public class Attachments {
      * @param attachment модель вложения
      */
     public static String getAttachmentDisplayName(AttachmentModel attachment) {
-        if (attachment.originalName != null && attachment.originalName.length() != 0) return attachment.originalName;
+        if ((attachment.originalName != null) &&
+            (attachment.originalName.length() != 0) &&
+            (attachment.originalName.lastIndexOf(".") != 0)) {
+            return attachment.originalName;
+        }
         if (attachment.type == AttachmentModel.TYPE_OTHER_NOTFILE) {
             return attachment.path == null ? "" : attachment.path;
         }
@@ -109,8 +114,17 @@ public class Attachments {
      * @param attachment модель вложения
      * @param boardModel модель доски, к которой относится вложение
      */
-    public static String getAttachmentLocalFileName(AttachmentModel attachment, BoardModel boardModel) {
+    public static String getAttachmentLocalFileName(AttachmentModel attachment, BoardModel boardModel, boolean useOriginalName) {
         if (attachment.type == AttachmentModel.TYPE_OTHER_NOTFILE) return attachment.path;
+        if (useOriginalName) {
+            if ((attachment.originalName != null) &&
+                (attachment.originalName.length() != 0) &&
+                (attachment.originalName.lastIndexOf(".") != 0)) {
+                return attachment.originalName;
+            } else {
+                return getLocalFilename(removeQueryString(attachment.path), "");
+            }
+        }
         final String suffix;
         if (boardModel == null) {
             suffix = '-' + ChanModels.hashAttachmentModel(attachment).substring(0, 4);
@@ -126,8 +140,17 @@ public class Attachments {
      * @param attachment модель вложения
      * @param boardModel модель доски, к которой относится вложение
      */
-    public static String getAttachmentLocalShortName(AttachmentModel attachment, BoardModel boardModel) {
+    public static String getAttachmentLocalShortName(AttachmentModel attachment, BoardModel boardModel, boolean useOriginalName) {
         if (attachment.type == AttachmentModel.TYPE_OTHER_NOTFILE) return attachment.path;
+        if (useOriginalName) {
+            if ((attachment.originalName != null) &&
+                (attachment.originalName.length() != 0) &&
+                (attachment.originalName.lastIndexOf(".") != 0)) {
+                return attachment.originalName;
+            } else {
+                return getLocalFilename(removeQueryString(attachment.path), "");
+            }
+        }
         return getLocalFilename(attachment.path,
                 (boardModel == null || boardModel.boardName == null || boardModel.boardName.length() == 0) ? null : ('-' + boardModel.boardName));
     }

@@ -313,6 +313,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:key="@string/pref_key_download_lazy"
             android:title="@string/pref_download_lazy_title"
             android:summary="@string/pref_download_lazy_summary" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/pref_key_download_original_names"
+            android:title="@string/pref_download_original_names_title"
+            android:summary="@string/pref_download_original_names_summary" />
     </PreferenceCategory>
     
     <PreferenceCategory android:title="@string/pref_cat_date_time" >

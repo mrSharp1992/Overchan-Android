@@ -566,6 +566,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_download_dir_summary">Das Verzeichnis, in dem Dateien gespeichert werden sollen</string>
     <string name="pref_download_lazy_title">Lazy Loading</string>
     <string name="pref_download_lazy_summary">Nur Thumbnails laden, die derzeit sichtbar sind</string>
+    <string name="pref_download_original_names_title">Ursprüngliche Dateinamen</string>
+    <string name="pref_download_original_names_summary">Speichern Sie Anhänge unter Verwendung der ursprünglichen Namen</string>
     <string name="pref_download_thumbs_title">Thumbnails automatisch herunterladen</string>
     <string-array name="pref_download_thumbs_choices">
         <item>Immer</item>
