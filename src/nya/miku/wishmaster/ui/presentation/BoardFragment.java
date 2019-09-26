@@ -3070,17 +3070,19 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         tmpDlg.requestWindowFeature(Window.FEATURE_NO_TITLE);
         tmpDlg.setCanceledOnTouchOutside(true);
         tmpDlg.setContentView(tmpV);
-        final Rect activityWindowRect;
+        final Rect activityWindowRect = new Rect();
+        activity.getWindow().getDecorView().getWindowVisibleDisplayFrame(activityWindowRect);
         final int dlgWindowWidth;
         final int dlgWindowHeight;
         if (isTablet) {
-            activityWindowRect = new Rect();
-            activity.getWindow().getDecorView().getWindowVisibleDisplayFrame(activityWindowRect);
             dlgWindowWidth = Math.max(coordinates.x, activityWindowRect.width() - coordinates.x);
             dlgWindowHeight = Math.max(coordinates.y, activityWindowRect.height() - coordinates.y);
             tmpDlg.getWindow().setLayout(dlgWindowWidth, dlgWindowHeight);
+        } else if (settings.widePopupDialogs()) {
+            dlgWindowWidth = activityWindowRect.width();
+            dlgWindowHeight = -1;
+            tmpDlg.getWindow().setLayout(dlgWindowWidth, ViewGroup.LayoutParams.WRAP_CONTENT);
         } else {
-            activityWindowRect = null;
             dlgWindowWidth = -1;
             dlgWindowHeight = -1;
         }
@@ -3138,6 +3140,10 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                     } else {
                         dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
                     }
+                } else {
+                    if (settings.widePopupDialogs()) {
+                        dialog.getWindow().setLayout(dlgWindowWidth, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    }
                 }
                 dialog.show();
                 dialogs.add(dialog);
@@ -3161,6 +3167,15 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         tmpDlg.requestWindowFeature(Window.FEATURE_NO_TITLE);
         tmpDlg.setCanceledOnTouchOutside(true);
         tmpDlg.setContentView(tmpV);
+        final Rect activityWindowRect = new Rect();
+        activity.getWindow().getDecorView().getWindowVisibleDisplayFrame(activityWindowRect);
+        final int dlgWindowWidth;
+        if (settings.widePopupDialogs()) {
+            dlgWindowWidth = activityWindowRect.width();
+            tmpDlg.getWindow().setLayout(dlgWindowWidth, ViewGroup.LayoutParams.WRAP_CONTENT);
+        } else {
+            dlgWindowWidth = -1;
+        }
         tmpDlg.show();
         Runnable next = new Runnable() {
             @Override
@@ -3247,6 +3262,9 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog.setCanceledOnTouchOutside(true);
                 dialog.setContentView(dlgList);
+                if (settings.widePopupDialogs()) {
+                    dialog.getWindow().setLayout(dlgWindowWidth, ViewGroup.LayoutParams.WRAP_CONTENT);
+                }
                 dialog.show();
                 dialogs.add(dialog);
             }
@@ -3304,6 +3322,15 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         tmpDlg.requestWindowFeature(Window.FEATURE_NO_TITLE);
         tmpDlg.setCanceledOnTouchOutside(true);
         tmpDlg.setContentView(tmpV);
+        final Rect activityWindowRect = new Rect();
+        activity.getWindow().getDecorView().getWindowVisibleDisplayFrame(activityWindowRect);
+        final int dlgWindowWidth;
+        if (settings.widePopupDialogs()) {
+            dlgWindowWidth = activityWindowRect.width();
+            tmpDlg.getWindow().setLayout(dlgWindowWidth, ViewGroup.LayoutParams.WRAP_CONTENT);
+        } else {
+            dlgWindowWidth = -1;
+        }
         tmpDlg.show();
         Runnable next = new Runnable() {
             @Override
@@ -3334,6 +3361,9 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog.setCanceledOnTouchOutside(true);
                 dialog.setContentView(dlgList);
+                if (settings.widePopupDialogs()) {
+                    dialog.getWindow().setLayout(dlgWindowWidth, ViewGroup.LayoutParams.WRAP_CONTENT);
+                }
                 dialog.show();
                 dialogs.add(dialog);
             }
