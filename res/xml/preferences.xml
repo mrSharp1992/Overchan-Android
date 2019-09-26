@@ -351,6 +351,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             android:dependency="@string/pref_key_enable_autoupdate" />
         
         <EditTextPreference
+            android:defaultValue=""
             android:key="@string/pref_key_autoupdate_delay"
             android:title="@string/pref_autoupdate_delay_title"
             android:hint="@string/pref_autoupdate_delay_hint"
