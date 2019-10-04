@@ -503,7 +503,9 @@ public class TumbachModule extends CloudflareChanModule {
                 this.captchaType = captchaType;
                 this.nodeCaptchaKey = null;
                 this.recaptchaV1 = null;
-                return null;
+                captchaModel = new CaptchaModel();
+                captchaModel.type = CaptchaModel.TYPE_INTERACTIVE;
+                return captchaModel;
             case CAPTCHA_RECAPTCHA_V1:
                 this.captchaType = captchaType;
                 this.nodeCaptchaKey = null;

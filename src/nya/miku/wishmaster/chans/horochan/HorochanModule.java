@@ -327,7 +327,14 @@ public class HorochanModule extends CloudflareChanModule {
     
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
-        return null;
+        boolean isThread = threadNumber == null;
+        if (isThread ? threadCaptchaEnabled : postCaptchaEnabled) {
+            CaptchaModel captchaModel = new CaptchaModel();
+            captchaModel.type = CaptchaModel.TYPE_INTERACTIVE;
+            return captchaModel;
+        } else {
+            return null;
+        }
     }
     
     @Override

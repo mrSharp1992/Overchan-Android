@@ -125,7 +125,11 @@ public class LampachModule extends AbstractWakabaModule {
     
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
-        if (RECAPTCHA_BOARD.equals(boardName)) return null;
+        if (RECAPTCHA_BOARD.equals(boardName)) {
+            CaptchaModel captchaModel = new CaptchaModel();
+            captchaModel.type = CaptchaModel.TYPE_INTERACTIVE;
+            return captchaModel;
+        }
         String captchaUrl = getUsingUrl() + boardName + "/inc/captcha.php";
         return downloadCaptcha(captchaUrl, listener, task);
     }

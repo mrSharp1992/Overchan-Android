@@ -429,6 +429,17 @@ public class FourchanModule extends CloudflareChanModule {
     }
     
     @Override
+    public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
+        if (!usingPasscode) {
+            CaptchaModel captchaModel = new CaptchaModel();
+            captchaModel.type = CaptchaModel.TYPE_INTERACTIVE;
+            return captchaModel;
+        } else {
+            return null;
+        }
+    }
+
+    @Override
     public String sendPost(SendPostModel model, ProgressListener listener, CancellableTask task) throws Exception {
         String recaptcha2 = Recaptcha2solved.pop(RECAPTCHA_KEY);
         if (!usingPasscode && (recaptcha2 == null)) {

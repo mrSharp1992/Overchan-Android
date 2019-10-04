@@ -36,6 +36,7 @@ import nya.miku.wishmaster.api.AbstractKusabaModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.BoardModel;
+import nya.miku.wishmaster.api.models.CaptchaModel;
 import nya.miku.wishmaster.api.models.DeletePostModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
@@ -152,7 +153,23 @@ public class HispachanModule extends AbstractKusabaModule {
         model.markType = BoardModel.MARK_BBCODE;
         return model;
     }
+
+    private String getCheckCaptchaUrl(String boardName, String threadNumber) {
+        return getUsingUrl() + "cl_captcha.php?board="+ boardName + "&v" + (threadNumber != null ? "&rp" : "");
+    }
     
+    @Override
+    public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
+        if (HttpStreamer.getInstance().getStringFromUrl(getCheckCaptchaUrl(boardName, threadNumber), HttpRequestModel.DEFAULT_GET,
+                httpClient, null, task, false).equals("1")) {
+            CaptchaModel captchaModel = new CaptchaModel();
+            captchaModel.type = CaptchaModel.TYPE_INTERACTIVE;
+            return captchaModel;
+        } else {
+            return null;
+        }
+    }
+
     @Override
     public String sendPost(SendPostModel model, ProgressListener listener, CancellableTask task) throws Exception {
         String url = getUsingUrl() + "board.php";
@@ -168,7 +185,7 @@ public class HispachanModule extends AbstractKusabaModule {
             addString("postpassword", model.password);
         setSendPostEntityAttachments(model, postEntityBuilder);
         
-        String checkCaptchaUrl = getUsingUrl() + "cl_captcha.php?board="+ model.boardName + "&v" + (model.threadNumber != null ? "&rp" : "");
+        String checkCaptchaUrl = getCheckCaptchaUrl(model.boardName, model.threadNumber);
         if (HttpStreamer.getInstance().getStringFromUrl(checkCaptchaUrl, HttpRequestModel.DEFAULT_GET,
                 httpClient, null, task, false).equals("1")) {
             String response = Recaptcha2solved.pop(RECAPTCHA_KEY);

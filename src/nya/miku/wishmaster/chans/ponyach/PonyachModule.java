@@ -63,6 +63,7 @@ import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.AttachmentModel;
 import nya.miku.wishmaster.api.models.BoardModel;
+import nya.miku.wishmaster.api.models.CaptchaModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
@@ -409,7 +410,23 @@ public class PonyachModule extends AbstractWakabaModule {
         board.markType = BoardModel.MARK_BBCODE;
         return board;
     }
+
+    private String getCaptchaUrl() {
+        return getUsingUrl() + "recaptchav2.php?c=isnd";
+    }
     
+    @Override
+    public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
+        if (HttpStreamer.getInstance().getStringFromUrl(getCaptchaUrl(),
+                HttpRequestModel.DEFAULT_GET, httpClient, null, task, false).equals("1")) {
+            CaptchaModel captchaModel = new CaptchaModel();
+            captchaModel.type = CaptchaModel.TYPE_INTERACTIVE;
+            return captchaModel;
+        } else {
+            return null;
+        }
+    }
+
     @Override
     public String sendPost(SendPostModel model, ProgressListener listener, CancellableTask task) throws Exception {
         String url = getUsingUrl() + "board.php";
@@ -421,7 +438,7 @@ public class PonyachModule extends AbstractWakabaModule {
                 addString("subject", model.subject).
                 addString("message", model.comment);
         
-        if (HttpStreamer.getInstance().getStringFromUrl(getUsingUrl() + "recaptchav2.php?c=isnd",
+        if (HttpStreamer.getInstance().getStringFromUrl(getCaptchaUrl(),
                 HttpRequestModel.DEFAULT_GET, httpClient, null, task, false).equals("1")) {
             String response = Recaptcha2solved.pop(RECAPTCHA_KEY);
             if (response == null) {

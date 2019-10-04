@@ -193,7 +193,13 @@ public class SynchModule extends AbstractVichanModule {
 
     @Override
     public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
-        return null;
+        if (Arrays.asList(BOARDS_WITH_CAPTCHA).contains(boardName)) {
+            CaptchaModel captchaModel = new CaptchaModel();
+            captchaModel.type = CaptchaModel.TYPE_INTERACTIVE;
+            return captchaModel;
+        } else {
+            return null;
+        }
     }
 
     @Override

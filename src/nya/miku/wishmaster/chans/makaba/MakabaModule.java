@@ -627,7 +627,9 @@ public class MakabaModule extends CloudflareChanModule {
                         return captchaModel;
                     case CAPTCHA_RECAPTCHA:
                     case CAPTCHA_RECAPTCHA_FALLBACK:
-                        return null;
+                        captchaModel = new CaptchaModel();
+                        captchaModel.type = CaptchaModel.TYPE_INTERACTIVE;
+                        return captchaModel;
                     case CAPTCHA_MAILRU:
                         UrlPageModel refererPage = new UrlPageModel();
                         refererPage.chanName = CHAN_NAME;

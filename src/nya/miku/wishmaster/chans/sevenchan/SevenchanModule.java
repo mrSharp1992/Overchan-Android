@@ -26,6 +26,7 @@ import nya.miku.wishmaster.api.AbstractKusabaModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.api.models.BoardModel;
+import nya.miku.wishmaster.api.models.CaptchaModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
@@ -187,6 +188,17 @@ public class SevenchanModule extends AbstractKusabaModule {
         return result;
     }
     
+    @Override
+    public CaptchaModel getNewCaptcha(String boardName, String threadNumber, ProgressListener listener, CancellableTask task) throws Exception {
+        if (threadNumber == null) {
+            CaptchaModel captchaModel = new CaptchaModel();
+            captchaModel.type = CaptchaModel.TYPE_INTERACTIVE;
+            return captchaModel;
+        } else {
+            return null;
+        }
+    }
+
     @Override
     protected void setSendPostEntityMain(SendPostModel model, ExtendedMultipartBuilder postEntityBuilder) throws Exception {
         super.setSendPostEntityMain(model, postEntityBuilder);
