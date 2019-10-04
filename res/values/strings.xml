@@ -218,6 +218,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         Keep in mind that the site may contain malware, dangerous for your device.\n\nAre you sure you want to proceed?</string>
     <string name="dialog_external_mail_title">E-mail</string>
     <string name="dialog_external_mail_text">%s\n\nFor email an external application will be opened.\n\nDo you want to continue?</string>
+    <string name="dialog_confirm_post_title">Sending post</string>
+    <string name="dialog_confirm_post_text">Your post is about to be sent.\n\nAre you sure you want to proceed?</string>
     
     <string name="dialog_save_thread_title">Saving the thread</string>
     <string name="dialog_save_thread_text">All attachments and thumbnails that have already been downloaded or present in the
@@ -486,6 +488,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_swipe_to_hide_summary">Swipe to hide thread</string>
     <string name="pref_external_links_confirmation_title">Links confirmation</string>
     <string name="pref_external_links_confirmation_summary">Ask before going external links</string>
+    <string name="pref_posting_confirmation_title">Posting confirmation</string>
+    <string name="pref_posting_confirmation_summary">Ask before sending a post without captcha</string>
     <string name="pref_do_not_close_tabs_title">Do not close tabs</string>
     <string name="pref_do_not_close_tabs_summary">Do not close tabs by pressing the Back button</string>
     <string name="pref_scroll_volume_buttons_title">Scroll with volume buttons</string>

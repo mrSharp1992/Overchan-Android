@@ -43,4 +43,8 @@ public class CaptchaModel {
      * Константное значение для обозначения типа капчи - числовая капча (допустимы только десятичные цифры)
      */
     public static final int TYPE_NORMAL_DIGITS = 1;
+    /**
+     * Константное значение для обозначения типа капчи - интерактивная капча (например, google recaptcha)
+     */
+    public static final int TYPE_INTERACTIVE = 2;
 }

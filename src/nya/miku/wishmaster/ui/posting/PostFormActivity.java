@@ -42,6 +42,7 @@ import nya.miku.wishmaster.ui.settings.ApplicationSettings;
 import nya.miku.wishmaster.ui.theme.ThemeUtils;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -109,6 +110,8 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
     private ArrayList<File> attachments;
     private String currentPath;
     
+    private boolean askConfirmation = false;
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -318,12 +321,30 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
             Toast.makeText(this, R.string.postform_empty_comment, Toast.LENGTH_LONG).show();
         } else {
             MainApplication.getInstance().draftsCache.clearLastCaptcha();
-            Intent startPostingService = new Intent(PostFormActivity.this, PostingService.class);
+            final Intent startPostingService = new Intent(PostFormActivity.this, PostingService.class);
             startPostingService.putExtra(PostingService.EXTRA_PAGE_HASH, hash);
             startPostingService.putExtra(PostingService.EXTRA_SEND_POST_MODEL, sendPostModel);
             startPostingService.putExtra(PostingService.EXTRA_BOARD_MODEL, boardModel);
-            finish();
-            startService(startPostingService);
+            if (askConfirmation) {
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (which == DialogInterface.BUTTON_POSITIVE) {
+                            finish();
+                            startService(startPostingService);
+                        }
+                    }
+                };
+                new AlertDialog.Builder(PostFormActivity.this).
+                    setTitle(getString(R.string.dialog_confirm_post_title)).
+                    setMessage(getString(R.string.dialog_confirm_post_text)).
+                    setPositiveButton(android.R.string.yes, dialogClickListener).
+                    setNegativeButton(android.R.string.no, dialogClickListener).
+                    show();
+            } else {
+                finish();
+                startService(startPostingService);
+            }
         }
     }
     
@@ -595,7 +616,8 @@ public class PostFormActivity extends Activity implements View.OnClickListener {
     private void switchToCaptcha(CaptchaModel captchaModel, boolean clearField) {
         if (clearField) captchaField.setText("");
         sendButton.setEnabled(true);
-        if (captchaModel != null) {
+        if (captchaModel == null && settings.askSendPost()) askConfirmation = true;
+        if (captchaModel != null && captchaModel.type != CaptchaModel.TYPE_INTERACTIVE) {
             captchaLoading.setVisibility(View.GONE);
             captchaView.setVisibility(View.VISIBLE);
             captchaView.setImageBitmap(captchaModel.bitmap);
