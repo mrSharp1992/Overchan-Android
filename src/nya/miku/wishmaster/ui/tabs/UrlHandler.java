@@ -46,9 +46,26 @@ public class UrlHandler {
     }
     
     public static void open(final String url, final MainActivity activity, boolean useFakeBrowserIfUrlNotHandled) {
-        TabModel model = getTabModel(getPageModel(url), activity.getResources());
+        final TabModel model = getTabModel(getPageModel(url), activity.getResources());
         if (model != null) {
-            open(model, activity, true);
+            if (MainApplication.getInstance().settings.askAnotherPage()) {
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (which == DialogInterface.BUTTON_POSITIVE) {
+                            open(model, activity, true);
+                        }
+                    }
+                };
+                new AlertDialog.Builder(activity).
+                    setTitle(activity.getString(R.string.dialog_another_page_title)).
+                    setMessage(activity.getString(R.string.dialog_another_page_text, url)).
+                    setPositiveButton(android.R.string.yes, dialogClickListener).
+                    setNegativeButton(android.R.string.no, dialogClickListener).
+                    show();
+            } else {
+                open(model, activity, true);
+            }
             return;
         }
         if (useFakeBrowserIfUrlNotHandled) {

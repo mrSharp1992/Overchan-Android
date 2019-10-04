@@ -218,6 +218,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         Beachten Sie, dass die Website kann Malware enthalten.\n\nSind Sie sicher, dass Sie fortfahren möchten?</string>
     <string name="dialog_external_mail_title">E-mail</string>
     <string name="dialog_external_mail_text">%s\n\nFür E-Mail wird eine externe Anwendung geöffnet werden.\n\nMöchten Sie weitermachen?</string>
+    <string name="dialog_another_page_title">Zu einer anderen Seite gehen</string>
+    <string name="dialog_another_page_text">%s\n\nMöchten Sie fortfahren?</string>
     
     <string name="dialog_save_thread_title">Thread Speichern</string>
     <string name="dialog_save_thread_text">Alle Anhänge und Thumbnails, die bereits im heruntergeladen wurden oder im Cache vorhanden sind,
@@ -487,6 +489,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_swipe_to_hide_summary">Swipe um Thread zu verstecken</string>
     <string name="pref_external_links_confirmation_title">Links Bestätigung</string>
     <string name="pref_external_links_confirmation_summary">Bestätigen Sie, bevor Sie externe Links öffnen</string>
+    <string name="pref_another_page_confirmation_title">Eine weitere Seitenbestätigung</string>
+    <string name="pref_another_page_confirmation_summary">Fragen Sie, bevor Sie Links zu anderen Seiten öffnen</string>
     <string name="pref_do_not_close_tabs_title">Tabs nicht schließen</string>
     <string name="pref_do_not_close_tabs_summary">Tabs durch Drücken der Zurück-Taste nicht schließen</string>
     <string name="pref_scroll_volume_buttons_title">Lautstärketasten zum Scrollen</string>

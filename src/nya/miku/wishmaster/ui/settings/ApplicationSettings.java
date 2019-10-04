@@ -399,6 +399,10 @@ public class ApplicationSettings {
         return preferences.getBoolean(resources.getString(R.string.pref_key_external_links_confirmation), true);
     }
     
+    public boolean askAnotherPage() {
+        return preferences.getBoolean(resources.getString(R.string.pref_key_another_page_confirmation), true);
+    }
+
     public boolean doNotCloseTabs() {
         return preferences.getBoolean(resources.getString(R.string.pref_key_do_not_close_tabs), false);
     }
