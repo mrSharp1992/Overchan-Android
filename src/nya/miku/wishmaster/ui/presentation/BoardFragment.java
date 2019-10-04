@@ -990,7 +990,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
             thisThreadModel.threadNumber = tabModel.pageModel.threadNumber;
             url = chan.buildUrl(thisThreadModel) + url;
         }
-        String fixedUrl = chan.fixRelativeUrl(url);
+        final String fixedUrl = chan.fixRelativeUrl(url);
         UrlPageModel model = UrlHandler.getPageModel(fixedUrl);
         if (model != null && model.type != UrlPageModel.TYPE_OTHERPAGE &&
                 (tabModel.type != TabModel.TYPE_LOCAL ?
@@ -1028,7 +1028,24 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                 Toast.makeText(activity, R.string.notification_post_not_found, Toast.LENGTH_LONG).show();
             }
         } else {
-            UrlHandler.open(fixedUrl, activity);
+            if (settings.askAnotherPage() && UrlHandler.getPageModel(fixedUrl) != null) {
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (which == DialogInterface.BUTTON_POSITIVE) {
+                            UrlHandler.open(fixedUrl, activity);
+                        }
+                    }
+                };
+                new AlertDialog.Builder(activity).
+                    setTitle(activity.getString(R.string.dialog_another_page_title)).
+                    setMessage(activity.getString(R.string.dialog_another_page_text, fixedUrl)).
+                    setPositiveButton(android.R.string.yes, dialogClickListener).
+                    setNegativeButton(android.R.string.no, dialogClickListener).
+                    show();
+            } else {
+                UrlHandler.open(fixedUrl, activity);
+            }
         }
     }
     

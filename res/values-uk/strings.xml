@@ -228,6 +228,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         \n\nПерейти за лінком?</string>
     <string name="dialog_external_mail_title">Пошта</string>
     <string name="dialog_external_mail_text">%s\n\nПередати адресу зовнішній програмі?</string>
+    <string name="dialog_another_page_title">Перехід на іншу сторінку</string>
+    <string name="dialog_another_page_text">%s\n\nБажаєте продовжити?</string>
     <string name="dialog_confirm_post_title">Відправка поста</string>
     <string name="dialog_confirm_post_text">Пост зараз буде відправлений\n\nБажаєте продовжити?</string>
     
@@ -499,6 +501,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_swipe_to_hide_summary">Приховувати треди свайпом</string>
     <string name="pref_external_links_confirmation_title">Підтвердження лінків</string>
     <string name="pref_external_links_confirmation_summary">Запит перед відкриттям лінків назовні</string>
+    <string name="pref_another_page_confirmation_title">Підтвердження зміни сторінки</string>
+    <string name="pref_another_page_confirmation_summary">Запит перед відкриттям лінків на інші сторінки</string>
     <string name="pref_posting_confirmation_title">Підтвердження постинга</string>
     <string name="pref_posting_confirmation_summary">Запит перед відправкою поста без капчі</string>
     <string name="pref_do_not_close_tabs_title">Не закривати вкладки</string>

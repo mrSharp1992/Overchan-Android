@@ -242,6 +242,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         
         <CheckBoxPreference
             android:defaultValue="true"
+            android:key="@string/pref_key_another_page_confirmation"
+            android:title="@string/pref_another_page_confirmation_title"
+            android:summary="@string/pref_another_page_confirmation_summary" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
             android:key="@string/pref_key_posting_confirmation"
             android:title="@string/pref_posting_confirmation_title"
             android:summary="@string/pref_posting_confirmation_summary" />
