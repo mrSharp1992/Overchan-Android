@@ -44,7 +44,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
@@ -71,8 +70,6 @@ import nya.miku.wishmaster.api.util.ChanModels;
 import nya.miku.wishmaster.api.util.LazyPreferences;
 import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
-import nya.miku.wishmaster.http.interactive.SimpleCaptchaException;
-import nya.miku.wishmaster.http.recaptcha.Recaptcha;
 import nya.miku.wishmaster.http.recaptcha.Recaptcha2;
 import nya.miku.wishmaster.http.recaptcha.Recaptcha2solved;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
@@ -90,15 +87,12 @@ public class FourchanModule extends CloudflareChanModule {
     private static final String PREF_KEY_PASS_PIN = "PREF_KEY_PASS_PIN";
     private static final String PREF_KEY_PASS_COOKIE = "PREF_KEY_PASS_COOKIE";
     
-    static final String RECAPTCHA_KEY = "6Ldp2bsSAAAAAAJ5uyx_lx34lJeEpTLVkP5k04qc";
+    private static final String RECAPTCHA_KEY = "6Ldp2bsSAAAAAAJ5uyx_lx34lJeEpTLVkP5k04qc";
     
     private boolean usingPasscode = false;
     
     private Map<String, BoardModel> boardsMap = null;
     private String[] iconIds = null;
-    
-    private Recaptcha reportRecaptcha = null;
-    private String reportCaptchaAnswer = null;
     
     private static final Pattern ERROR_POSTING = Pattern.compile("<span id=\"errmsg\"(?:[^>]*)>(.*?)(?:</span>|<br)");
     private static final Pattern SUCCESS_POSTING = Pattern.compile("<!-- thread:(\\d+),no:(\\d+) -->");
@@ -293,23 +287,12 @@ public class FourchanModule extends CloudflareChanModule {
         fallbackRecaptchaPref.setTitle(R.string.fourchan_prefs_new_recaptcha_fallback);
         fallbackRecaptchaPref.setSummary(R.string.fourchan_prefs_new_recaptcha_fallback_summary);
         fallbackRecaptchaPref.setKey(getSharedKey(PREF_KEY_NEW_RECAPTCHA_FALLBACK));
-        fallbackRecaptchaPref.setDefaultValue(true);
+        fallbackRecaptchaPref.setDefaultValue(false);
         preferenceGroup.addPreference(fallbackRecaptchaPref);
         
         addPasswordPreference(preferenceGroup);
         addHttpsPreference(preferenceGroup, true);
         addProxyPreferences(preferenceGroup);
-        
-        final CheckBoxPreference proxyPreference = (CheckBoxPreference) preferenceGroup.findPreference(getSharedKey(PREF_KEY_USE_PROXY));
-        fallbackRecaptchaPref.setEnabled(!proxyPreference.isChecked());
-        proxyPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {            
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                fallbackRecaptchaPref.setEnabled(!proxyPreference.isChecked());
-                if (proxyPreference.isChecked() && !fallbackRecaptchaPref.isChecked()) fallbackRecaptchaPref.setChecked(true);
-                return false;
-            }
-        });
     }
     
     private boolean useHttps() {
@@ -317,13 +300,7 @@ public class FourchanModule extends CloudflareChanModule {
     }
     
     private boolean newRecaptchaFallback() {
-        return preferences.getBoolean(getSharedKey(PREF_KEY_USE_PROXY), false) ||
-                preferences.getBoolean(getSharedKey(PREF_KEY_NEW_RECAPTCHA_FALLBACK), true);
-    }
-    
-    @Override
-    protected boolean cloudflareRecaptchaFallback() {
-        return newRecaptchaFallback();
+        return preferences.getBoolean(getSharedKey(PREF_KEY_NEW_RECAPTCHA_FALLBACK), false);
     }
     
     @Override
@@ -527,33 +504,19 @@ public class FourchanModule extends CloudflareChanModule {
     
     @Override
     public String reportPost(final DeletePostModel model, ProgressListener listener, final CancellableTask task) throws Exception {
-        if (reportCaptchaAnswer == null) {
-            throw new SimpleCaptchaException() {
-                private static final long serialVersionUID = 1L;
-                @Override
-                public String getServiceName() {
-                    return "Recaptcha";
-                }
-                @Override
-                protected Bitmap getNewCaptcha() throws Exception {
-                    reportRecaptcha = Recaptcha.obtain(RECAPTCHA_KEY, task, httpClient, "https");
-                    return reportRecaptcha.bitmap;
-                }
-                @Override
-                protected void storeResponse(String response) {
-                    reportCaptchaAnswer = response;
-                }
-            };
+        String recaptcha2 = Recaptcha2solved.pop(RECAPTCHA_KEY);
+        if (!usingPasscode && (recaptcha2 == null)) {
+            throw Recaptcha2.obtain(
+                    "https://4chan.org/", RECAPTCHA_KEY, null, CHAN_NAME, false);
         } else {
             String url = "https://sys.4chan.org/" + model.boardName + "/imgboard.php?mode=report&no=" + model.postNumber;
             ExtendedMultipartBuilder postEntityBuilder = ExtendedMultipartBuilder.create().setDelegates(listener, task).
                     addString("cat", "vio").
-                    addString("recaptcha_challenge_field", reportRecaptcha.challenge).
-                    addString("recaptcha_response_field", reportCaptchaAnswer).
                     addString("board", model.boardName).
                     addString("no", model.postNumber);
-            reportCaptchaAnswer = null;
-            reportRecaptcha = null;
+            if (!usingPasscode) {
+                postEntityBuilder.addString("g-recaptcha-response", recaptcha2);
+            }
             HttpRequestModel request = HttpRequestModel.builder().setPOST(postEntityBuilder.build()).build();
             String response = HttpStreamer.getInstance().getStringFromUrl(url, request, httpClient, listener, task, false);
             if (response.contains("https://www.4chan.org/banned")) throw new Exception("You can't report posts because you are banned");
