@@ -18,10 +18,12 @@
 
 package nya.miku.wishmaster.chans.infinity;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.preference.CheckBoxPreference;
 import android.preference.PreferenceGroup;
 import android.support.v4.content.res.ResourcesCompat;
 
@@ -46,6 +48,7 @@ import nya.miku.wishmaster.api.models.DeletePostModel;
 import nya.miku.wishmaster.api.models.PostModel;
 import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
+import nya.miku.wishmaster.api.util.LazyPreferences;
 import nya.miku.wishmaster.api.util.RegexUtils;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
 import nya.miku.wishmaster.http.streamer.HttpRequestModel;
@@ -54,9 +57,10 @@ import nya.miku.wishmaster.lib.base64.Base64;
 import nya.miku.wishmaster.lib.org_json.JSONObject;
 
 public class LolifoxModule extends InfinityModule {
-    private static final String CHAN_NAME = "animach.moe";
-    private static final String DEFAULT_DOMAIN = "animach.moe";
-    private static final String[] DOMAINS = new String[]{DEFAULT_DOMAIN};
+    private static final String CHAN_NAME = "lolifox.cc";
+    private static final String DEFAULT_DOMAIN = "lolifox.cc";
+    private static final String ONION_DOMAIN = "wn3ghyuon5eaqyxi7yauald3d53gsxrkanzpu2qdyc54vobif2qutsid.onion";
+    private static final String[] DOMAINS = new String[]{DEFAULT_DOMAIN, ONION_DOMAIN};
 
     private static final Pattern PROTECTED_URL_PATTERN = Pattern.compile("<a[^>]*href=\"https?://privatelink.de/\\?([^\"]*)\"[^>]*>");
     private static final Pattern CAPTCHA_BASE64 = Pattern.compile("data:image/png;base64,([^\"]+)\"");
@@ -72,7 +76,7 @@ public class LolifoxModule extends InfinityModule {
 
     @Override
     public String getDisplayingName() {
-        return "Animach";
+        return "LOLIFOX";
     }
 
     @Override
@@ -82,7 +86,7 @@ public class LolifoxModule extends InfinityModule {
 
     @Override
     protected String getUsingDomain() {
-        return DEFAULT_DOMAIN;
+        return preferences.getBoolean(getSharedKey(PREF_KEY_USE_ONION), false) ? ONION_DOMAIN : DEFAULT_DOMAIN;
     }
 
     @Override
@@ -96,9 +100,23 @@ public class LolifoxModule extends InfinityModule {
     }
 
     @Override
+    protected boolean useHttps() {
+        return !preferences.getBoolean(getSharedKey(PREF_KEY_USE_ONION), false) && useHttps(true);
+    }
+
+    @Override
     public void addPreferencesOnScreen(PreferenceGroup preferenceGroup) {
+        Context context = preferenceGroup.getContext();
         addPasswordPreference(preferenceGroup);
-        addHttpsPreference(preferenceGroup, true);
+        CheckBoxPreference httpsPref = addHttpsPreference(preferenceGroup, true);
+        CheckBoxPreference onionPref = new LazyPreferences.CheckBoxPreference(context);
+        onionPref.setTitle(R.string.pref_use_onion);
+        onionPref.setSummary(R.string.pref_use_onion_summary);
+        onionPref.setKey(getSharedKey(PREF_KEY_USE_ONION));
+        onionPref.setDefaultValue(false);
+        onionPref.setDisableDependentsState(true);
+        preferenceGroup.addPreference(onionPref);
+        httpsPref.setDependency(getSharedKey(PREF_KEY_USE_ONION));
         addCloudflareRecaptchaFallbackPreference(preferenceGroup);
         addProxyPreferences(preferenceGroup);
     }

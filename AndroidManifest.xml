@@ -196,7 +196,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <data android:host="tbpchan.net" />
                 <data android:host="www.tbpchan.net" />
 
-                <data android:host="animach.moe" />
+                <data android:host="lolifox.cc" />
+                <data android:host="www.lolifox.cc" />
+                <data android:host="wn3ghyuon5eaqyxi7yauald3d53gsxrkanzpu2qdyc54vobif2qutsid.onion" />
+                <data android:host="www.wn3ghyuon5eaqyxi7yauald3d53gsxrkanzpu2qdyc54vobif2qutsid.onion" />
                 <!-- end of domains -->
             </intent-filter>
             <intent-filter>
