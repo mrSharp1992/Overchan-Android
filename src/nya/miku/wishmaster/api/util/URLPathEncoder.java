@@ -28,6 +28,6 @@ public class URLPathEncoder {
             path_field.setAccessible(true);
             path_field.set(mUrl, Uri.encode(mUrl.getPath(), ALLOWED_CHARACTERS));
         }
-        return mUrl.toURI().toString();
+        return mUrl.toURI().toASCIIString();
     }
 }
