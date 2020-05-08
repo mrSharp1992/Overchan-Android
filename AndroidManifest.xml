@@ -129,7 +129,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <data android:host="beta.krautchan.net" />
                 
                 <data android:host="kohlchan.net" />
+                <data android:host="kohlkanal.net" />
+                <data android:host="kohlchanagb7ih5g.onion" />
+                <data android:host="kohlchanvwpfx6hthoti5fvqsjxgcwm3tmddvpduph5fqntv5affzfqd.onion" />
                 <data android:host="www.kohlchan.net" />
+                <data android:host="www.kohlkanal.net" />
+                <data android:host="www.kohlchanagb7ih5g.onion" />
+                <data android:host="www.kohlchanvwpfx6hthoti5fvqsjxgcwm3tmddvpduph5fqntv5affzfqd.onion" />
                 
                 <data android:host="ernstchan.xyz" />
                 <data android:host="www.ernstchan.xyz" />

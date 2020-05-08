@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import cz.msebera.android.httpclient.cookie.Cookie;
@@ -49,6 +50,8 @@ import nya.miku.wishmaster.api.models.SendPostModel;
 import nya.miku.wishmaster.api.models.SimpleBoardModel;
 import nya.miku.wishmaster.api.models.UrlPageModel;
 import nya.miku.wishmaster.api.util.RegexUtils;
+import nya.miku.wishmaster.api.util.UrlPathUtils;
+import nya.miku.wishmaster.api.util.WakabaUtils;
 import nya.miku.wishmaster.common.IOUtils;
 import nya.miku.wishmaster.common.Logger;
 import nya.miku.wishmaster.http.ExtendedMultipartBuilder;
@@ -72,16 +75,18 @@ public class KohlchanModule extends AbstractLynxChanModule {
     private static final String DEFAULT_DOMAIN = "kohlchan.net";
     private static final String PREF_KEY_DOMAIN = "domain";
     private static final List<String> DOMAINS_LIST = Arrays.asList(
-            DEFAULT_DOMAIN, "kohlchan.mett.ru", "kohlchankxguym67.onion", "fastkohlp6h2seef.onion",
-            "kohlchan7cwtdwfuicqhxgqx4k47bsvlt2wn5eduzovntrzvonv4cqyd.onion",
-            "fastkohlt5rxcxtl5no7k3efmahlt7mafry7be6yvxdovekhq2hdnwqd.onion");
-    private static final String DOMAINS_HINT = "kohlchan.net, kohlchan.mett.ru, kohlchankxguym67.onion, fastkohlp6h2seef.onion";
+            DEFAULT_DOMAIN, "kohlkanal.net", "kohlchanagb7ih5g.onion",
+            "kohlchanvwpfx6hthoti5fvqsjxgcwm3tmddvpduph5fqntv5affzfqd.onion");
+    private static final String DOMAINS_HINT = "kohlchan.net, kohlkanal.net, kohlchanagb7ih5g.onion, kohlchanvwpfx6hthoti5fvqsjxgcwm3tmddvpduph5fqntv5affzfqd.onion";
     
     private static final String[] ATTACHMENT_FORMATS = new String[] {
             "jpg", "jpeg", "bmp", "gif", "png", "webp", "mp3", "ogg", "flac", "opus", "webm", "mp4",
             "7z", "zip", "pdf", "epub", "txt" };
     private static final Pattern INVALID_LESSER_THAN_PATTERN = Pattern.compile("&lt([^;])");
     private static final Pattern LINE_BREAK_PATTERN = Pattern.compile("\\n");
+    private static final Pattern COOKIES_LINK_PATTERN = Pattern.compile("^addon.js/hashcash\\?action=save&b=([0-9a-f]{24})&h=([0-9a-f]{24})");
+    private static final String PREF_KEY_EXTRA_COOKIE = "PREF_KEY_EXTRA_COOKIE";
+    private static final String EXTRA_COOKIE_NAME = "extraCookie";
     
     private String domain;
     private Map<String, String> captchas = new HashMap<>();
@@ -183,10 +188,20 @@ public class KohlchanModule extends AbstractLynxChanModule {
         return ResourcesCompat.getDrawable(resources, R.drawable.favicon_kohlchan, null);
     }
 
+    private void saveBypassCookie(String bypassCookie, String extraCookie) {
+        if (bypassCookie != null)
+            preferences.edit().putString(getSharedKey(PREF_KEY_BYPASS_COOKIE), bypassCookie).commit();
+        if (extraCookie != null)
+            preferences.edit().putString(getSharedKey(PREF_KEY_EXTRA_COOKIE), extraCookie).commit();
+        loadBypassCookie();
+    }
+
     private void saveBypassCookie() {
         for (Cookie cookie : httpClient.getCookieStore().getCookies()) {
             if (cookie.getName().equals(BYPASS_COOKIE_NAME) && cookie.getDomain().contains(getUsingDomain())) {
                 preferences.edit().putString(getSharedKey(PREF_KEY_BYPASS_COOKIE), cookie.getValue()).commit();
+            } else if (cookie.getName().equals(EXTRA_COOKIE_NAME) && cookie.getDomain().contains(getUsingDomain())) {
+                preferences.edit().putString(getSharedKey(PREF_KEY_EXTRA_COOKIE), cookie.getValue()).commit();
             }
         }
     }
@@ -195,6 +210,13 @@ public class KohlchanModule extends AbstractLynxChanModule {
         String bypassCookie = preferences.getString(getSharedKey(PREF_KEY_BYPASS_COOKIE), null);
         if (bypassCookie != null) {
             BasicClientCookie c = new BasicClientCookie(BYPASS_COOKIE_NAME, bypassCookie);
+            c.setDomain(getUsingDomain());
+            c.setPath("/");
+            httpClient.getCookieStore().addCookie(c);
+        }
+        String extraCookie = preferences.getString(getSharedKey(PREF_KEY_EXTRA_COOKIE), null);
+        if (extraCookie != null) {
+            BasicClientCookie c = new BasicClientCookie(EXTRA_COOKIE_NAME, extraCookie);
             c.setDomain(getUsingDomain());
             c.setPath("/");
             httpClient.getCookieStore().addCookie(c);
@@ -279,6 +301,8 @@ public class KohlchanModule extends AbstractLynxChanModule {
         String status = result.optString("status");
         if ("ok".equals(status)) {
             return true;
+        } else if ("hashcash".equals(status)) {
+            throw new Exception("Bypass required");
         } else if (status.equals("error")) {
             String errorMessage = result.optString("data");
             if (errorMessage.length() > 0) {
@@ -305,9 +329,12 @@ public class KohlchanModule extends AbstractLynxChanModule {
             case "new":
             case "next":
                 throw new KohlchanCaptchaException();
+            case "ok":
             case "finish":
                 saveBypassCookie();
                 return;
+            case "hashcash":
+                throw new Exception("Bypass required");
             case "error":
                 throw new Exception(response.optString("data", "Captcha Error"));
             default: throw new Exception("Unknown Error");
@@ -392,6 +419,8 @@ public class KohlchanModule extends AbstractLynxChanModule {
             }
         } else if ("bypassable".equals(status)) {
             throw new KohlchanCaptchaException();
+        } else if ("hashcash".equals(status)) {
+            throw new Exception("Bypass required");
         } else if("banned".equals(status)) {
             String banMessage = "You have been banned!";
             try {
@@ -437,6 +466,8 @@ public class KohlchanModule extends AbstractLynxChanModule {
             } catch (JSONException e) {
                 Logger.e(TAG, "Incorrect delete content result");
             }
+        } else if ("hashcash".equals(status)) {
+            throw new Exception("Bypass required");
         } else if (status.contains("error")) {
             String errorMessage = result.optString("data");
             if (errorMessage.length() > 0) {
@@ -478,6 +509,8 @@ public class KohlchanModule extends AbstractLynxChanModule {
         String status = result.optString("status");
         if ("ok".equals(status)) {
             return null;
+        } else if ("hashcash".equals(status)) {
+            throw new Exception("Bypass required");
         } else if (status.equals("error")) {
             String errorMessage = result.optString("data");
             if (errorMessage.length() > 0) {
@@ -485,5 +518,20 @@ public class KohlchanModule extends AbstractLynxChanModule {
             }
         }
         throw new Exception("Unknown Error");
+    }
+
+    @Override
+    public UrlPageModel parseUrl(String url) throws IllegalArgumentException {
+        String urlPath = UrlPathUtils.getUrlPath(url, getAllDomains());
+        if (urlPath == null)
+            throw new IllegalArgumentException("wrong domain");
+        Matcher matcher = COOKIES_LINK_PATTERN.matcher(urlPath);
+        if (matcher.find()) {
+            String bypassCookie = matcher.group(1);
+            String extraCookie = matcher.group(2);
+            saveBypassCookie(bypassCookie, extraCookie);
+            return WakabaUtils.parseUrlPath("/", getChanName(), false);
+        }
+        return super.parseUrl(url);
     }
 }
