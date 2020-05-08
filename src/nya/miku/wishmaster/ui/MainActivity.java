@@ -72,6 +72,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.webkit.URLUtil;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -376,6 +377,9 @@ public class MainActivity extends FragmentActivity {
         (theme = MainApplication.getInstance().settings.getTheme()).setTo(this);
         thumbnailSize = MainApplication.getInstance().settings.getPostThumbnailSize();
         super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
+        }
         if (MainApplication.getInstance().settings.showSidePanel()) {
             setContentView(tabsPanelRight ? R.layout.main_activity_tablet_right : R.layout.main_activity_tablet);
             LinearLayout.LayoutParams sidebarLayoutParams = (LinearLayout.LayoutParams) findViewById(R.id.sidebar).getLayoutParams();
