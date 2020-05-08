@@ -804,12 +804,19 @@ public class MainActivity extends FragmentActivity {
     
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
-        if (settings.scrollVolumeButtons) {
-            switch (keyCode) {
-                case KeyEvent.KEYCODE_VOLUME_UP:
-                case KeyEvent.KEYCODE_VOLUME_DOWN:
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_VOLUME_UP:
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                if (settings.scrollVolumeButtons)
                     return true;
-            }
+                break;
+            case KeyEvent.KEYCODE_BACK:
+                int flags = event.getFlags();
+                if ((flags & KeyEvent.FLAG_TRACKING) == 0 ||
+                    (flags & KeyEvent.FLAG_CANCELED) != 0 ||
+                    onBack(false))
+                    return true;
+                break;
         }
         return super.onKeyUp(keyCode, event);
     }
@@ -832,10 +839,6 @@ public class MainActivity extends FragmentActivity {
                     }
                 }
                 break;
-            case KeyEvent.KEYCODE_BACK:
-                if (event.getRepeatCount() > 0) return true;
-                if (onBack()) return true;
-                break;
             case KeyEvent.KEYCODE_DPAD_LEFT:
                 if (focusActionBar()) return true;
                 break;
@@ -843,7 +846,14 @@ public class MainActivity extends FragmentActivity {
         return super.onKeyDown(keyCode, event);
     }
     
-    private boolean onBack() {
+    @Override
+    public boolean onKeyLongPress(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK)
+            return onBack(true);
+        return false;
+    }
+
+    private boolean onBack(boolean longPress) {
         if (tabsAdapter != null && tabsAdapter.getDraggingItem() != -1) {
             tabsAdapter.setDraggingItem(-1);
             return true;
@@ -852,7 +862,7 @@ public class MainActivity extends FragmentActivity {
             closeDrawer();
             return true;
         }
-        if (tabsAdapter != null && tabsAdapter.back()) {
+        if (tabsAdapter != null && tabsAdapter.back(longPress)) {
             return true;
         }
         return false;

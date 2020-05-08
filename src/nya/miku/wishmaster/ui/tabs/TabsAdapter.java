@@ -188,14 +188,14 @@ public class TabsAdapter extends ArrayAdapter<TabModel> {
      * Метод для обработки нажатия клавиши "Назад"
      * @return
      */
-    public boolean back() {
+    public boolean back(boolean longPress) {
         if (selectedItem < 0) {
             if (!tabsIdStack.isEmpty()) {
                 setSelectedItemId(tabsIdStack.getCurrentTab());
                 return true;
             }
         } else {
-            if (MainApplication.getInstance().settings.doNotCloseTabs()) {
+            if (MainApplication.getInstance().settings.doNotCloseTabs() ^ longPress) {
                 tabsIdStack.removeTab(getItem(selectedItem).id);
                 if (tabsIdStack.isEmpty()) {
                     setSelectedItem(TabModel.POSITION_NEWTAB);
