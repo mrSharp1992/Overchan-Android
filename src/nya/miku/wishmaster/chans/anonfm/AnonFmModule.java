@@ -221,7 +221,8 @@ public class AnonFmModule extends AbstractChanModule {
             posts[i].number = Long.toString(time); //current.getString(4) ?
             posts[i].name = current.getString(1).equals("!") ? "Объявление" : current.getString(1);
             posts[i].subject = "";
-            posts[i].comment = "<blockquote class=\"unkfunc\">" + current.getString(2) + "</blockquote>" + current.getString(5);
+            posts[i].comment = "<blockquote class=\"unkfunc\">" + RegexUtils.linkify(current.getString(2)) +
+                "</blockquote>" + RegexUtils.linkify(current.getString(5));
             posts[i].timestamp = startday + time;
             while (posts[i].timestamp > (i<json.length() ? posts[i+1].timestamp : now)) posts[i].timestamp -= oneday;
             posts[i].parentThread = threadNumber;
