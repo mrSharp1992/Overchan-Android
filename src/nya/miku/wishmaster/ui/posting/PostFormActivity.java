@@ -304,7 +304,12 @@ public class PostFormActivity extends Activity implements View.OnClickListener, 
                 }
                 if (!CompatibilityUtils.hasAccessStorage(this)) return true;
                 Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-                i.setType("image/*");
+                i.setType("*/*");
+                i.putExtra(Intent.EXTRA_MIME_TYPES, new String[] {
+                    "image/*",
+                    "video/*",
+                    "audio/*"
+                });
                 startActivityForResult(i, REQUEST_CODE_ATTACH_GALLERY);
                 return true;
         }
