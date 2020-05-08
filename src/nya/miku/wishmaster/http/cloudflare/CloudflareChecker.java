@@ -18,7 +18,9 @@
 
 package nya.miku.wishmaster.http.cloudflare;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
@@ -31,9 +33,15 @@ import nya.miku.wishmaster.http.streamer.HttpStreamer;
 import nya.miku.wishmaster.lib.WebViewProxy;
 import nya.miku.wishmaster.ui.CompatibilityImpl;
 
+import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.HttpHeaders;
 import cz.msebera.android.httpclient.HttpHost;
+import cz.msebera.android.httpclient.NameValuePair;
 import cz.msebera.android.httpclient.client.CookieStore;
 import cz.msebera.android.httpclient.client.HttpClient;
+import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
+import cz.msebera.android.httpclient.message.BasicHeader;
+import cz.msebera.android.httpclient.message.BasicNameValuePair;
 import cz.msebera.android.httpclient.conn.params.ConnRouteParams;
 import cz.msebera.android.httpclient.cookie.Cookie;
 import cz.msebera.android.httpclient.cookie.SetCookie;
@@ -87,7 +95,7 @@ public class CloudflareChecker {
      * @return полученная cookie или null, если проверка не прошла по таймауту, или проверка уже проходит в другом потоке
      */
     public Cookie checkAntiDDOS(CloudflareException exception, HttpClient httpClient, CancellableTask task, Activity activity) {
-        if (exception.isRecaptcha()) throw new IllegalArgumentException();
+        if (exception.isHcaptcha()) throw new IllegalArgumentException();
         
         HttpHost proxy = null;
         if (httpClient instanceof ExtendedHttpClient) {
@@ -204,19 +212,26 @@ public class CloudflareChecker {
     }
     
     /**
-     * Проверить рекапчу cloudflare, получить cookie
+     * Проверить капчу cloudflare, получить cookie
      * @param exception Cloudflare исключение
      * @param httpClient HTTP клиент
      * @param task отменяемая задача
-     * @param challenge challenge рекапчи
-     * @param recaptchaAnswer ответ на рекапчу
+     * @param answer ответ на капчу
      * @return полученная cookie или null, если проверка не прошла
      */
-    public Cookie checkRecaptcha(CloudflareException exception, ExtendedHttpClient httpClient, CancellableTask task, String url) {
-        if (!exception.isRecaptcha()) throw new IllegalArgumentException("wrong type of CloudflareException");
+    public Cookie checkCaptcha(CloudflareException exception, ExtendedHttpClient httpClient, CancellableTask task, String url, String answer) {
+        if (!exception.isHcaptcha()) throw new IllegalArgumentException("wrong type of CloudflareException");
         HttpResponseModel responseModel = null;
         try {
-            HttpRequestModel rqModel = HttpRequestModel.builder().setGET().setNoRedirect(false).build();
+            List<NameValuePair> pairs = new ArrayList<NameValuePair>();
+            pairs.add(new BasicNameValuePair("r", exception.getRToken()));
+            pairs.add(new BasicNameValuePair("cf_captcha_kind", "h"));
+            pairs.add(new BasicNameValuePair("h-captcha-response", answer));
+            Header[] customHeaders = new Header[] {new BasicHeader(HttpHeaders.REFERER, exception.getCheckUrl())};
+            HttpRequestModel rqModel = HttpRequestModel.builder().
+                setPOST(new UrlEncodedFormEntity(pairs)).
+                setCustomHeaders(customHeaders).
+                setNoRedirect(false).build();
             CookieStore cookieStore = httpClient.getCookieStore();
             removeCookie(cookieStore, exception.getRequiredCookieName());
             responseModel = HttpStreamer.getInstance().getFromUrl(url, rqModel, httpClient, null, task);

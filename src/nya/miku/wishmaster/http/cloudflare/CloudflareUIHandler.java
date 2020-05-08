@@ -23,9 +23,9 @@ import nya.miku.wishmaster.api.HttpChanModule;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.common.Async;
 import nya.miku.wishmaster.http.client.ExtendedHttpClient;
+import nya.miku.wishmaster.http.hcaptcha.Hcaptcha;
+import nya.miku.wishmaster.http.hcaptcha.HcaptchaSolved;
 import nya.miku.wishmaster.http.interactive.InteractiveException;
-import nya.miku.wishmaster.http.recaptcha.Recaptcha2;
-import nya.miku.wishmaster.http.recaptcha.Recaptcha2solved;
 import cz.msebera.android.httpclient.cookie.Cookie;
 
 import android.app.Activity;
@@ -48,13 +48,13 @@ import android.app.Activity;
      * или в контексте которой будет создан WebView для Anti DDOS проверки с javascript.
      * Используется как доступ к UI потоку ({@link Activity#runOnUiThread(Runnable)})
      * @param cfTask отменяемая задача
-     * @param callback интерфейс {@link Callback}
+     * @param callback интерфейс {@link InteractiveException.Callback}
      */
     static void handleCloudflare(final CloudflareException e, final HttpChanModule chan, final Activity activity, final CancellableTask cfTask,
             final InteractiveException.Callback callback) {
         if (cfTask.isCancelled()) return;
         
-        if (!e.isRecaptcha()) {  // обычная anti DDOS проверка
+        if (!e.isHcaptcha()) {  // обычная anti DDOS проверка
             if (!CloudflareChecker.getInstance().isAvaibleAntiDDOS()) {
                 //если анти ддос проверка уже проводится другим потоком, тогда подождем завершения и объявим успех
                 //в случае, если проверка была по тому же ChanModule, проверка уже будет пройдена
@@ -89,17 +89,16 @@ import android.app.Activity;
                     }
                 });
             }
-        } else {  // проверка с рекапчей
-            Recaptcha2.obtain(e.getCheckUrl(), e.getRecaptchaPublicKey(), e.getRecaptchaSecureToken(), chan.getChanName(), e.isRecaptchaFallback()).
+        } else {  // проверка с капчей
+            Hcaptcha.obtain(e.getCheckUrl(), e.getHcaptchaPublicKey()).
                     handle(activity, cfTask, new InteractiveException.Callback() {
                 @Override
                 public void onSuccess() {
                     Async.runAsync(new Runnable() {
                         @Override
                         public void run() {
-                            String url = e.getCheckCaptchaUrlPrefix() + Recaptcha2solved.pop(e.getRecaptchaPublicKey());
-                            Cookie cfCookie = CloudflareChecker.getInstance().
-                                    checkRecaptcha(e, (ExtendedHttpClient) chan.getHttpClient(), cfTask, url);
+                            Cookie cfCookie = CloudflareChecker.getInstance().checkCaptcha(e, (ExtendedHttpClient)chan.getHttpClient(),
+                                    cfTask, e.getCheckCaptchaUrl(), HcaptchaSolved.pop(e.getHcaptchaPublicKey()));
                             if (cfCookie != null) {
                                 chan.saveCookie(cfCookie);
                                 if (!cfTask.isCancelled()) {

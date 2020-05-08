@@ -88,7 +88,7 @@ public abstract class CloudflareChanModule extends AbstractChanModule {
         if (e.getStatusCode() == 403) {
             String html = e.getHtmlString();
             if (html != null && html.contains("CAPTCHA")) {
-                throw CloudflareException.withRecaptcha(url, getChanName(), html, cloudflareRecaptchaFallback());
+                throw CloudflareException.withHcaptcha(url, getChanName(), html);
             }
         } else if (e.getStatusCode() == 503) {
             String html = e.getHtmlString();
@@ -117,6 +117,7 @@ public abstract class CloudflareChanModule extends AbstractChanModule {
         }
     }
     
+    @Deprecated
     protected boolean cloudflareRecaptchaFallback() {
         return preferences.getBoolean(getSharedKey(PREF_KEY_CLOUDFLARE_RECAPTCHA_FALLBACK), false);
     }
