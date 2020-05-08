@@ -495,6 +495,7 @@ public class TumbachModule extends CloudflareChanModule {
                 String captchaUrl = getUsingUrl() + "node-captcha/" + json.getString("fileName");
                 captchaModel = downloadCaptcha(captchaUrl, listener, task);
                 captchaModel.type = CaptchaModel.TYPE_NORMAL_DIGITS;
+                captchaModel.adaptable = false;
                 this.captchaType = captchaType;
                 this.nodeCaptchaKey = challenge;
                 return captchaModel;
