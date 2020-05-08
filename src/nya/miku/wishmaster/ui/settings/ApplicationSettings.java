@@ -85,6 +85,10 @@ public class ApplicationSettings {
         return preferences.getBoolean(resources.getString(R.string.pref_key_random_hash), false);
     }
     
+    public boolean isFakeFilenames() {
+        return preferences.getBoolean(resources.getString(R.string.pref_key_fake_filenames), false);
+    }
+
     public boolean isLocalTime() {
         return preferences.getBoolean(resources.getString(R.string.pref_key_local_time), true);
     }

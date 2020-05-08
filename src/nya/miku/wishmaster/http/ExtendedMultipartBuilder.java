@@ -28,6 +28,7 @@ import java.util.Random;
 import nya.miku.wishmaster.api.interfaces.CancellableTask;
 import nya.miku.wishmaster.api.interfaces.ProgressListener;
 import nya.miku.wishmaster.common.IOUtils;
+import nya.miku.wishmaster.common.MainApplication;
 
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.HttpEntity;
@@ -87,9 +88,24 @@ public class ExtendedMultipartBuilder {
         return addPart(key, new StringBody(value, ContentType.create("text/plain", "UTF-8")));
     }
     
+    private long lastFakeFilenameTimestamp = 0;
+
+    private String generateFakeFilename(File file) {
+        String name = file.getName().toString();
+        int dot = name.lastIndexOf('.');
+        String ext = dot == -1 ? "" : name.substring(dot);
+        long fakeFilenameTimestamp = System.currentTimeMillis();
+        if (fakeFilenameTimestamp <= lastFakeFilenameTimestamp)
+            fakeFilenameTimestamp += lastFakeFilenameTimestamp - fakeFilenameTimestamp + 1;
+        lastFakeFilenameTimestamp = fakeFilenameTimestamp;
+        return Long.toString(fakeFilenameTimestamp) + ext;
+    }
+
     private ExtendedMultipartBuilder addFile(String key, File value, String mimeType, final int randomTail) {
         return addPart(key, new FileBody(value, (mimeType == null || mimeType.length() == 0) ?
-                ContentType.APPLICATION_OCTET_STREAM : ContentType.create(mimeType)) {
+                ContentType.APPLICATION_OCTET_STREAM : ContentType.create(mimeType),
+                MainApplication.getInstance().settings.isFakeFilenames() ?
+                generateFakeFilename(value) : null) {
             @Override
             public long getContentLength() {
                 return super.getContentLength() + randomTail;

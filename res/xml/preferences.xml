@@ -225,6 +225,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         
         <CheckBoxPreference
             android:defaultValue="false"
+            android:key="@string/pref_key_fake_filenames"
+            android:title="@string/pref_fake_filenames_title"
+            android:summary="@string/pref_fake_filenames_summary" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
             android:key="@string/pref_key_show_all_chans_list"
             android:title="@string/pref_show_all_chans_list_title"
             android:summary="@string/pref_show_all_chans_list_summary" />
