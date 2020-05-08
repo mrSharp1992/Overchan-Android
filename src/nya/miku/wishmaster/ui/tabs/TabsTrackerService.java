@@ -369,7 +369,7 @@ public class TabsTrackerService extends Service {
     }
     
     private class TrackerLoop extends BaseCancellableTask implements Runnable {
-        private int timerCounter = 0;
+        private int timerCounter = Integer.MAX_VALUE - 1;
         
         @Override
         public void run() {
